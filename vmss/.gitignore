@@ -1,4 +1,4 @@
-# Ignore checking in these files to Git
+# Ignore checking these files to Git
 
 .terraform
 .terraform.lock.hcl

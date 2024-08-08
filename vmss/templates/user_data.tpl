@@ -1,14 +1,14 @@
 #!/bin/bash
 
 set -x
-exec > >(tee /var/log/tf-user-data.log|logger -t user-data ) 2>&1
+exec > >(tee /var/log/terraform-user-data.log|logger -t user-data ) 2>&1
 
 logger() {
   DT=$(date '+%Y/%m/%d %H:%M:%S')
   echo "$DT $0: $1"
 }
 
-logger "Running"
+logger "Starting user data script"
 
 sudo apt install -y jq
 sudo useradd vault
@@ -30,7 +30,7 @@ sudo chown vault:vault /opt/vault
 sudo mkdir /etc/vault.d
 sudo chown vault:vault /opt/vault
 
-# Get IP addresses of VM from the Instance Metadata Service 
+# Get the IP addresses of the VMs using the Instance Metadata Service 
 PRIVATE_IP=$(curl -H "Metadata: true" "http://169.254.169.254/metadata/instance/network/interface/0/ipv4/ipAddress/0?api-version=2021-02-01" | jq -r .privateIpAddress)
 PUBLIC_IP=$(curl -H "Metadata: true" "http://169.254.169.254/metadata/instance/network/interface/0/ipv4/ipAddress/0?api-version=2021-02-01" | jq -r .publicIpAddress)
 
@@ -95,4 +95,4 @@ LimitCORE=0
 WantedBy=multi-user.target
 EOL
 
-logger "Complete"
+logger "User data script complete"

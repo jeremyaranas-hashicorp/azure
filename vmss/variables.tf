@@ -12,3 +12,8 @@ variable "public_key" {
   type    = string
   default = true
 }
+
+variable "instances" {
+  type    = string
+  default = "1"
+}

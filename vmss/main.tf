@@ -5,29 +5,29 @@ provider "azurerm" {
 
 # Setup Azure resource group
 resource "azurerm_resource_group" "vmss_resource_group" {
-  name     = "vmss-resources"
+  name     = "vmss-rg"
   location = "West US"
 }
 
 # Setup Azure virtual network
 resource "azurerm_virtual_network" "vmss_network" {
-  name                = "vmss-network"
+  name                = "vmss-net"
   resource_group_name = azurerm_resource_group.vmss_resource_group.name
   location            = azurerm_resource_group.vmss_resource_group.location
   address_space       = ["10.0.0.0/16"]
 }
 
 # Setup Azure subnet
-resource "azurerm_subnet" "internal" {
-  name                 = "internal"
+resource "azurerm_subnet" "vmss_internal_subnet" {
+  name                 = "vmss-internal-snet"
   resource_group_name  = azurerm_resource_group.vmss_resource_group.name
   virtual_network_name = azurerm_virtual_network.vmss_network.name
   address_prefixes     = ["10.0.2.0/24"]
 }
 
 # Setup Azure VMSS
-resource "azurerm_linux_virtual_machine_scale_set" "azure_linux_vmss" {
-  name                = "vmss"
+resource "azurerm_linux_virtual_machine_scale_set" "azure_vmss" {
+  name                = "vmss-terraform"
   resource_group_name = azurerm_resource_group.vmss_resource_group.name
   user_data = base64encode(templatefile("templates/user_data.tpl", {
     vault_version = var.vault_version
@@ -36,12 +36,12 @@ resource "azurerm_linux_virtual_machine_scale_set" "azure_linux_vmss" {
 
   location            = azurerm_resource_group.vmss_resource_group.location
   sku                 = "Standard_F2"
-  instances           = 1
-  admin_username      = "adminuser"
+  instances           = var.instances
+  admin_username      = "azure-user"
 
   # Setup SSH to VM
   admin_ssh_key {
-    username   = "adminuser"
+    username   = "azure-user"
     public_key = var.public_key
   }
 
@@ -67,7 +67,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "azure_linux_vmss" {
     ip_configuration {
       name      = "internal"
       primary   = true
-      subnet_id = azurerm_subnet.internal.id
+      subnet_id = azurerm_subnet.vmss_internal_subnet.id
 
       public_ip_address {
         name                   = "vmss-public-ip"
