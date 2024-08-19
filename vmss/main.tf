@@ -3,6 +3,10 @@ provider "azurerm" {
   features {}
 }
 
+module "sub_id" {
+  source = "./modules"
+}
+
 # Setup Azure resource group
 resource "azurerm_resource_group" "vmss_resource_group" {
   name     = "vmss-rg"
@@ -32,7 +36,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "azure_vmss" {
   user_data = base64encode(templatefile("templates/user_data.tpl", {
     vault_version = var.vault_version
     vault_license = var.vault_license
-    azure_sub_id = var.azure_sub_id
+    azure_sub_id = module.sub_id.current_subscription_display_name
     azure_rg = var.azure_rg
     azure_vmss = var.azure_vmss
     azure_tenant_id = var.azure_tenant_id
@@ -83,10 +87,6 @@ resource "azurerm_linux_virtual_machine_scale_set" "azure_vmss" {
 provider "azuread" {
 }
 
-# resource "azuread_application" "azure_app" {
-#   display_name = "azure-app"
-# }
-
 data "azuread_client_config" "current" {}
 
 resource "azuread_application" "azure_app" {
@@ -100,20 +100,21 @@ resource "azuread_service_principal" "azure_sp" {
   owners                       = [data.azuread_client_config.current.object_id]
 }
 
-# output "application_id" {
-#   value = azuread_application.azure_app.application_id
-# }
+resource "azuread_service_principal_password" "azure_sp_pw" {
+  service_principal_id = azuread_service_principal.azure_sp.object_id
+}
 
-# output "client_id" {
-#   value = azuread_service_principal.azure_sp.application_id
-# }
+output "sp" {
+  value     = azuread_service_principal.azure_sp.id
+  sensitive = true
+}
 
-# resource "azuread_service_principal_password" "azure_sp_pw" {
-#   service_principal_id = azuread_service_principal.azure_sp.object_id
-#   value                = "your-password-here" # Replace with a secure password
-#   end_date_relative    = "240h"               # Password expiration (10 days)
-# }
+output "sp_password" {
+  value     = azuread_service_principal_password.azure_sp_pw.value
+  sensitive = true
+}
 
-# output "client_secret" {
-#   value = azuread_service_principal_password.azure_sp_pw.value
-# }
+# terraform output sp
+# terraform output sp_password
+
+
