@@ -1,8 +1,12 @@
-# Import azurerm provider
+# Import providers
 provider "azurerm" {
   features {}
 }
 
+provider "azuread" {
+}
+
+# Import module for subscription ID
 module "sub_id" {
   source = "./modules"
 }
@@ -40,6 +44,8 @@ resource "azurerm_linux_virtual_machine_scale_set" "azure_vmss" {
     azure_rg = var.azure_rg
     azure_vmss = var.azure_vmss
     azure_tenant_id = var.azure_tenant_id
+    azure_sp_client_id = azuread_service_principal.azure_sp.client_id
+    # azure_secret = azure_secret
       }))
 
   location            = azurerm_resource_group.vmss_resource_group.location
@@ -84,35 +90,36 @@ resource "azurerm_linux_virtual_machine_scale_set" "azure_vmss" {
   }
 }
 
-provider "azuread" {
-}
 
+# Access AzureAD provider
 data "azuread_client_config" "current" {}
 
+# Create app registration
 resource "azuread_application" "azure_app" {
   display_name = "azure-app"
   owners       = [data.azuread_client_config.current.object_id]
 }
 
+# Create service principal for application
 resource "azuread_service_principal" "azure_sp" {
   client_id                    = azuread_application.azure_app.client_id
   app_role_assignment_required = false
   owners                       = [data.azuread_client_config.current.object_id]
 }
 
-resource "azuread_service_principal_password" "azure_sp_pw" {
-  service_principal_id = azuread_service_principal.azure_sp.object_id
-}
+# resource "azuread_service_principal_password" "azure_sp_pw" {
+#   service_principal_id = azuread_service_principal.azure_sp.object_id
+# }
 
-output "sp" {
-  value     = azuread_service_principal.azure_sp.id
-  sensitive = true
-}
+# output "sp" {
+#   value     = azuread_service_principal.azure_sp.id
+#   sensitive = true
+# }
 
-output "sp_password" {
-  value     = azuread_service_principal_password.azure_sp_pw.value
-  sensitive = true
-}
+# output "sp_password" {
+#   value     = azuread_service_principal_password.azure_sp_pw.value
+#   sensitive = true
+# }
 
 # terraform output sp
 # terraform output sp_password

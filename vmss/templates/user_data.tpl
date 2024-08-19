@@ -49,7 +49,7 @@ storage "raft" {
   path = "/opt/vault/"
   retry_join {
     auto_join_scheme = "http"
-    auto_join = "provider=azure subscription_id=${azure_sub_id} tenant_id=${azure_tenant_id} resource_group=${azure_rg} vm_scale_set=${azure_vmss}"
+    # auto_join = "provider=azure subscription_id=${azure_sub_id} tenant_id=${azure_tenant_id} resource_group=${azure_rg} vm_scale_set=${azure_vmss} secret_access_key=${azure_secret} client_id=${azure_sp_client_id}"
   }
 }
 
