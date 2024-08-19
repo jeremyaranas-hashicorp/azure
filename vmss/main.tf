@@ -32,6 +32,10 @@ resource "azurerm_linux_virtual_machine_scale_set" "azure_vmss" {
   user_data = base64encode(templatefile("templates/user_data.tpl", {
     vault_version = var.vault_version
     vault_license = var.vault_license
+    azure_sub_id = var.azure_sub_id
+    azure_rg = var.azure_rg
+    azure_vmss = var.azure_vmss
+    azure_tenant_id = var.azure_tenant_id
       }))
 
   location            = azurerm_resource_group.vmss_resource_group.location
@@ -65,7 +69,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "azure_vmss" {
     primary = true
 
     ip_configuration {
-      name      = "internal"
+      name      = "internal-ip"
       primary   = true
       subnet_id = azurerm_subnet.vmss_internal_subnet.id
 
