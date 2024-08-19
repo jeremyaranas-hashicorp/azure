@@ -59,8 +59,21 @@ azure_tenant_id = "<tenant_id>"
 # Configure Auto-join
 
 1. Set permissions [to be added to Terraform]
-   1. Go to the VMSS -> *Access Control (IAM)* -> *Add a role assignment* -> *Privileged administrator roles* -> *Owner* -> *Next* ->  *Select members* -> add service principal (azure-app) -> *Select* -> *Next* -> *Allow user to assign all roles (highly privileged)* -> *Next* ->  *Review + assign*
-   2. From the VMSS, *Instances* -> for each instance, click on the instance -> expand the *Networking* menu - > *Network settings* -> click on the network interface to open the network interface -> *Access control (IAM)* -> *Add a role assignment* -> *Privileged administrator roles* -> *Owner* -> *Next* -> *Select members* -> add service principal (azure-app) -> *Select* -> *Next* -> *Allow user to assign all roles (highly privileged)* -> *Next* -> *Review + assign*
+   1. Go to [Resource groups](https://portal.azure.com/#browse/resourcegroups)
+   2. Select **vmss-rg**
+   3. Click *Access control (IAM)*
+   4. Click *Add role assignment* 
+   5. Click on *Privileged administrator roles* tab 
+   6. Select *Owner* 
+   7. Click *Next*
+   8. Click *Select members*
+   9. Search for **azure-app** service principal
+   10. Click on **azure-app** service principal
+   11. Click *Select*
+   12. Click *Next*
+   13. Select *Allow user to assign all roles (highly privileged)*
+   14. Click *Review + assign*
+   15. Click *Review + assign* once again to confirm
 2. Proceed with initializing Vault
 
 # Wishlist
