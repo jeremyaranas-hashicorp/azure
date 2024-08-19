@@ -79,3 +79,41 @@ resource "azurerm_linux_virtual_machine_scale_set" "azure_vmss" {
     }
   }
 }
+
+provider "azuread" {
+}
+
+# resource "azuread_application" "azure_app" {
+#   display_name = "azure-app"
+# }
+
+data "azuread_client_config" "current" {}
+
+resource "azuread_application" "azure_app" {
+  display_name = "azure-app"
+  owners       = [data.azuread_client_config.current.object_id]
+}
+
+resource "azuread_service_principal" "azure_sp" {
+  client_id                    = azuread_application.azure_app.client_id
+  app_role_assignment_required = false
+  owners                       = [data.azuread_client_config.current.object_id]
+}
+
+# output "application_id" {
+#   value = azuread_application.azure_app.application_id
+# }
+
+# output "client_id" {
+#   value = azuread_service_principal.azure_sp.application_id
+# }
+
+# resource "azuread_service_principal_password" "azure_sp_pw" {
+#   service_principal_id = azuread_service_principal.azure_sp.object_id
+#   value                = "your-password-here" # Replace with a secure password
+#   end_date_relative    = "240h"               # Password expiration (10 days)
+# }
+
+# output "client_secret" {
+#   value = azuread_service_principal_password.azure_sp_pw.value
+# }
