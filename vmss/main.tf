@@ -7,9 +7,7 @@ provider "azuread" {
 }
 
 # Import modules 
-module "subscription_id" {
-  source = "./modules"
-}
+
 
 module "app_registration" {
   source = "./modules"
@@ -44,7 +42,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "azure_vmss" {
   user_data = base64encode(templatefile("templates/user_data.tpl", {
     vault_version = var.vault_version
     vault_license = var.vault_license
-    azure_sub_id = module.subscription_id.current_subscription_display_name
+    azure_sub_id = module.app_registration.current_subscription_display_name
     azure_rg = var.azure_rg
     azure_vmss = var.azure_vmss
     azure_tenant_id = var.azure_tenant_id
