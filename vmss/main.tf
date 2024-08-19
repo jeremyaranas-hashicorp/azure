@@ -98,6 +98,11 @@ data "azuread_client_config" "current" {}
 resource "azuread_application" "azure_app" {
   display_name = "azure-app"
   owners       = [data.azuread_client_config.current.object_id]
+
+
+  password {
+    display_name = "azure-vmss-secret"
+  }
 }
 
 # Create service principal for application
@@ -107,21 +112,11 @@ resource "azuread_service_principal" "azure_sp" {
   owners                       = [data.azuread_client_config.current.object_id]
 }
 
-# resource "azuread_service_principal_password" "azure_sp_pw" {
-#   service_principal_id = azuread_service_principal.azure_sp.object_id
-# }
-
-# output "sp" {
-#   value     = azuread_service_principal.azure_sp.id
-#   sensitive = true
-# }
-
 # output "sp_password" {
 #   value     = azuread_service_principal_password.azure_sp_pw.value
 #   sensitive = true
 # }
 
-# terraform output sp
 # terraform output sp_password
 
 
