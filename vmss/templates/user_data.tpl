@@ -53,6 +53,14 @@ storage "raft" {
   }
 }
 
+seal "azurekeyvault" {
+  client_id      = "${azure_sp_client_id}"
+  client_secret  = "${azure_secret}"
+  tenant_id      = "${azure_tenant_id}"
+  vault_name     = "${vault_name}"
+  key_name       = "${key_name}"
+}
+
 api_addr = "http://$PUBLIC_IP:8200"
 cluster_addr = "http://$PRIVATE_IP:8201"
 

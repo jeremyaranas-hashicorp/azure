@@ -38,3 +38,7 @@ variable "azure_tenant_id" {
   default = ""
 }
 
+variable "key_name" {
+  type    = string
+  default = ""
+}

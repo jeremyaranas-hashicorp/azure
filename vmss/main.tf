@@ -1,14 +1,23 @@
 # Import providers
-provider "azurerm" {
-  features {}
+terraform {
+  required_providers {
+    random  = "~> 3.1.2"
+    azurerm = "~> 3.116.0"
+    azuread = "~> 2.53.1"
+  }
 }
 
-provider "azuread" {
+provider "azurerm" {
+  features {}
 }
 
 # Import modules 
 module "app_registration" {
   source = "./modules"
+}
+
+resource "random_id" "vault" {
+  byte_length = 4
 }
 
 # Setup Azure resource group
@@ -33,6 +42,63 @@ resource "azurerm_subnet" "vmss_internal_subnet" {
   address_prefixes     = ["10.0.2.0/24"]
 }
 
+# Azure Key Vault
+resource "azurerm_key_vault" "vault" {
+  name                = "vault-${random_id.vault.hex}"
+  location            = azurerm_resource_group.vmss_resource_group.location
+  resource_group_name = azurerm_resource_group.vmss_resource_group.name
+  tenant_id           = var.azure_tenant_id
+  enabled_for_deployment = true
+
+  sku_name = "standard"
+
+  # Access policy for  service principal
+  access_policy {
+    tenant_id = var.azure_tenant_id
+    object_id = module.app_registration.service_account_object_id
+
+    key_permissions = [
+      "Get",
+      "WrapKey",
+      "UnwrapKey",
+    ]
+  }
+
+  # Access policy for the user running Terraform
+  access_policy {
+    tenant_id = var.azure_tenant_id
+    object_id = data.azurerm_client_config.current.object_id
+
+    key_permissions = [
+      "Get",
+      "List",
+      "Create",
+      "Delete",
+      "Update",
+    ]
+  }
+}
+
+data "azurerm_client_config" "current" {
+}
+
+# Azure key to wrap/encrypt its master key
+resource "azurerm_key_vault_key" "azure_hc_vault" {
+  name         = var.key_name
+  key_vault_id = azurerm_key_vault.vault.id
+  key_type     = "RSA"
+  key_size     = 2048
+
+  key_opts = [
+    "wrapKey",
+    "unwrapKey",
+  ]
+}
+
+output "key_vault_name" {
+  value = azurerm_key_vault.vault.name
+}
+
 # Setup Azure VMSS
 resource "azurerm_linux_virtual_machine_scale_set" "azure_vmss" {
   name                = "vmss-terraform"
@@ -46,6 +112,8 @@ resource "azurerm_linux_virtual_machine_scale_set" "azure_vmss" {
     azure_tenant_id = var.azure_tenant_id
     azure_sp_client_id = module.app_registration.azure_sp_client_id
     azure_secret = module.app_registration.azure_app_pw
+    vault_name = azurerm_key_vault.vault.name
+    key_name = var.key_name
       }))
 
   location            = azurerm_resource_group.vmss_resource_group.location

@@ -30,16 +30,16 @@ Once your Azure account has been setup with developer access, proceed with the f
 6. Start Vault service on the first node
    1. `sudo systemctl start vault`
 7. Initialize Vault on the first node
-   1. `vault operator init -format=json -key-shares=1 -key-threshold=1 > init.json`
-8.  Unseal Vault on the first node
-   1. `vault operator unseal $(jq -r .unseal_keys_hex[0] init.json)`
+   1. `vault operator init -format=json > init.json`
+<!-- 8.  Unseal Vault on the first node
+   1. `vault operator unseal $(jq -r .unseal_keys_hex[0] init.json)` -->
 9.  Login to Vault on the first node
    1. `vault login $(jq -r .root_token init.json)`
 10. Start Vault service on the second node
    1.  `sudo systemctl start vault`
-11. Unseal Vault on the second node
+<!-- 11. Unseal Vault on the second node
     1.  `vault operator unseal <unseal_key>`
-    2.  This node should initialize and join the cluster using auto-join
+    2.  This node should initialize and join the cluster using auto-join -->
 12. Repeat steps 10-11 for each additional node
 
 To cleanup the environment, run a `terraform destroy`
@@ -52,9 +52,5 @@ vault_version = "1.16.2+ent"
 public_key = "<your_public_key>"
 instances = "3"
 azure_tenant_id = "237fbc04-c52a-458b-af97-eaf7157c0cd4"
+key_name = "azure-auto-unseal-key"
 ```
-
-# Wishlist
-
-* Auto-unseal using Azure
-<!-- * Auto-join -->

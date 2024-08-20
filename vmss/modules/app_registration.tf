@@ -43,3 +43,7 @@ resource "azurerm_role_assignment" "role_assignment" {
   principal_id         = azuread_service_principal.azure_sp.object_id
   skip_service_principal_aad_check = true
 }
+
+output "service_account_object_id" {
+    value = azuread_service_principal.azure_sp.object_id
+}
