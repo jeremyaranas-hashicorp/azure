@@ -7,8 +7,6 @@ provider "azuread" {
 }
 
 # Import modules 
-
-
 module "app_registration" {
   source = "./modules"
 }

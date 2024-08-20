@@ -18,10 +18,12 @@ resource "azuread_service_principal" "azure_sp" {
   owners                       = [data.azuread_client_config.current.object_id]
 }
 
+# Output client ID
 output "azure_sp_client_id" {
   value     = azuread_service_principal.azure_sp.client_id
 }
 
+# Output client secret
 output "azure_app_pw" {
   sensitive = true
   value     = tolist(azuread_application.azure_app.password).0.value
@@ -34,3 +36,10 @@ output "current_subscription_display_name" {
     value = data.azurerm_subscription.current.subscription_id
 }
 
+# Configure a role assignment for azure-app service principal with Owner permissions to subscription
+resource "azurerm_role_assignment" "role_assignment" {
+  scope                = data.azurerm_subscription.current.id
+  role_definition_name = "Owner"
+  principal_id         = azuread_service_principal.azure_sp.object_id
+  skip_service_principal_aad_check = true
+}
