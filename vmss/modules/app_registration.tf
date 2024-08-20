@@ -36,7 +36,7 @@ output "current_subscription_display_name" {
     value = data.azurerm_subscription.current.subscription_id
 }
 
-# Configure a role assignment for azure-app service principal with Owner permissions to subscription
+# Configure a role assignment for azure-app service principal with Owner permissions to current subscription
 resource "azurerm_role_assignment" "role_assignment" {
   scope                = data.azurerm_subscription.current.id
   role_definition_name = "Owner"

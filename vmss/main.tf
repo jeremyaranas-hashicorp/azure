@@ -8,7 +8,12 @@ terraform {
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    key_vault {
+      purge_soft_deleted_keys_on_destroy = true
+      recover_soft_deleted_keys          = true
+    }
+  }
 }
 
 # Import modules 
@@ -16,6 +21,7 @@ module "app_registration" {
   source = "./modules"
 }
 
+# Set random ID
 resource "random_id" "vault" {
   byte_length = 4
 }
@@ -52,29 +58,63 @@ resource "azurerm_key_vault" "vault" {
 
   sku_name = "standard"
 
-  # Access policy for  service principal
+  # Access policy for service principal
+  # Need to fix permissions
   access_policy {
     tenant_id = var.azure_tenant_id
     object_id = module.app_registration.service_account_object_id
 
     key_permissions = [
+      "Backup",
+      "Create",
+      "Decrypt",
+      "Delete",
+      "Encrypt",
       "Get",
-      "WrapKey",
+      "Import",
+      "List",
+      "Purge",
+      "Recover",
+      "Release",
+      "Restore",
+      "Rotate",
+      "Sign",
       "UnwrapKey",
+      "Update",
+      "Verify",
+      "WrapKey",
+      "GetRotationPolicy",
+      "SetRotationPolicy"
     ]
   }
 
   # Access policy for the user running Terraform
+  # Need to fix permissions
   access_policy {
     tenant_id = var.azure_tenant_id
     object_id = data.azurerm_client_config.current.object_id
 
-    key_permissions = [
-      "Get",
-      "List",
+        key_permissions = [
+      "Backup",
       "Create",
+      "Decrypt",
       "Delete",
+      "Encrypt",
+      "Get",
+      "Import",
+      "List",
+      "Purge",
+      "Recover",
+      "Release",
+      "Restore",
+      "Rotate",
+      "Sign",
+      "UnwrapKey",
       "Update",
+      "Verify",
+      "WrapKey",
+      "GetRotationPolicy",
+      "SetRotationPolicy"
     ]
   }
 }
@@ -90,8 +130,12 @@ resource "azurerm_key_vault_key" "azure_hc_vault" {
   key_size     = 2048
 
   key_opts = [
-    "wrapKey",
+    "decrypt",
+    "encrypt",
+    "sign",
     "unwrapKey",
+    "verify",
+    "wrapKey",
   ]
 }
 
@@ -157,7 +201,5 @@ resource "azurerm_linux_virtual_machine_scale_set" "azure_vmss" {
     }
   }
 }
-
-
 
 

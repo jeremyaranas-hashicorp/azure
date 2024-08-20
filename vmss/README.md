@@ -1,4 +1,4 @@
-This reproduction will deploy an Azure Virtual Machine Scale Set (VMSS), install Vault, and auto-join the nodes.
+This reproduction will deploy an Azure Virtual Machine Scale Set (VMSS) and install Vault. The nodes will auto-join the cluster and auto-unseal.
 
 # Instructions
 
@@ -31,16 +31,10 @@ Once your Azure account has been setup with developer access, proceed with the f
    1. `sudo systemctl start vault`
 7. Initialize Vault on the first node
    1. `vault operator init -format=json > init.json`
-<!-- 8.  Unseal Vault on the first node
-   1. `vault operator unseal $(jq -r .unseal_keys_hex[0] init.json)` -->
-9.  Login to Vault on the first node
+8.  Login to Vault on the first node
    1. `vault login $(jq -r .root_token init.json)`
-10. Start Vault service on the second node
+9.  Start Vault service on each additional node
    1.  `sudo systemctl start vault`
-<!-- 11. Unseal Vault on the second node
-    1.  `vault operator unseal <unseal_key>`
-    2.  This node should initialize and join the cluster using auto-join -->
-12. Repeat steps 10-11 for each additional node
 
 To cleanup the environment, run a `terraform destroy`
 
