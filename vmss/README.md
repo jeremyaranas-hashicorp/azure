@@ -1,4 +1,4 @@
-This reproduction will deploy an Azure Virtual Machine Scale Set (VMSS) and install Vault. The nodes will auto-join the cluster and auto-unseal.
+This reproduction will deploy an Azure Virtual Machine Scale Set (VMSS) and install Vault with auto-join and auto-unseal.
 
 # Instructions
 

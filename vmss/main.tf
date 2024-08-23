@@ -17,7 +17,7 @@ provider "azurerm" {
 }
 
 # Import modules 
-module "app_registration" {
+module "azure" {
   source = "./modules"
 }
 
@@ -59,10 +59,10 @@ resource "azurerm_key_vault" "vault" {
   sku_name = "standard"
 
   # Access policy for service principal
-  # Need to fix permissions
+  # In this example, the policy has all key permissions
   access_policy {
     tenant_id = var.azure_tenant_id
-    object_id = module.app_registration.service_account_object_id
+    object_id = module.azure.service_account_object_id
 
     key_permissions = [
       "Backup",
@@ -89,12 +89,12 @@ resource "azurerm_key_vault" "vault" {
   }
 
   # Access policy for the user running Terraform
-  # Need to fix permissions
+  # In this example, the policy has all key permissions
   access_policy {
     tenant_id = var.azure_tenant_id
     object_id = data.azurerm_client_config.current.object_id
 
-        key_permissions = [
+    key_permissions = [
       "Backup",
       "Create",
       "Decrypt",
@@ -139,10 +139,6 @@ resource "azurerm_key_vault_key" "azure_hc_vault" {
   ]
 }
 
-output "key_vault_name" {
-  value = azurerm_key_vault.vault.name
-}
-
 # Setup Azure VMSS
 resource "azurerm_linux_virtual_machine_scale_set" "azure_vmss" {
   name                = "vmss-terraform"
@@ -150,12 +146,12 @@ resource "azurerm_linux_virtual_machine_scale_set" "azure_vmss" {
   user_data = base64encode(templatefile("templates/user_data.tpl", {
     vault_version = var.vault_version
     vault_license = var.vault_license
-    azure_sub_id = module.app_registration.current_subscription_display_name
+    azure_sub_id = module.azure.current_subscription_display_name
     azure_rg = var.azure_rg
     azure_vmss = var.azure_vmss
     azure_tenant_id = var.azure_tenant_id
-    azure_sp_client_id = module.app_registration.azure_sp_client_id
-    azure_secret = module.app_registration.azure_app_pw
+    azure_sp_client_id = module.azure.azure_sp_client_id
+    azure_secret = module.azure.azure_app_pw
     vault_name = azurerm_key_vault.vault.name
     key_name = var.key_name
       }))
@@ -201,5 +197,3 @@ resource "azurerm_linux_virtual_machine_scale_set" "azure_vmss" {
     }
   }
 }
-
-
