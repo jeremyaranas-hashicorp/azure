@@ -41,10 +41,10 @@ To cleanup the environment, run a `terraform destroy`
 # Example terraform.tfvars file
 
 ```
-vault_license = "<your_license>"
+vault_license = "<your_vault_ent_license>"
 vault_version = "1.16.2+ent"
-public_key = "<your_public_key>"
+public_key = "<your_ssh_public_key>"
 instances = "3"
 azure_tenant_id = "237fbc04-c52a-458b-af97-eaf7157c0cd4"
-key_name = "azure-auto-unseal-key"
+key_name = "<your_key_name>"
 ```
