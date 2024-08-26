@@ -18,7 +18,7 @@ This reproduction will deploy an Azure Virtual Machine Scale Set (VMSS) and inst
 
 Once your Azure account has been setup with developer access, proceed with the following.
 
-1. Create a `terraform.tfvars` to set variables for your environment (see example)
+1. Create a `terraform.tfvars` to set variables for your environment (see [example](https://github.com/jeremyaranas-hashicorp/azure/blob/main/vmss/README.md#example-terraformtfvars-file))
 2. Run Terraform
    1. `terraform init`
    2. `terraform plan`
