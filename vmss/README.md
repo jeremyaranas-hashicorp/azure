@@ -4,7 +4,7 @@ This reproduction will deploy an Azure Virtual Machine Scale Set (VMSS) and inst
 
 1. Create Azure subscription
     1. In Doormat, go to Accounts -> Azure -> Create Temporary Subscription 
-       1. Tenant ID should be `237fbc04-c52a-458b-af97-eaf7157c0cd4`
+       1. Tenant ID
  2. From the terminal, authenticate with Azure to configure Terraform to run against the Azure subscription 
        1. `az login`
  3. A new window browser window will open
@@ -45,6 +45,6 @@ vault_license = "<your_vault_ent_license>"
 vault_version = "1.16.2+ent"
 public_key = "<your_ssh_public_key>"
 instances = "3"
-azure_tenant_id = "237fbc04-c52a-458b-af97-eaf7157c0cd4"
+azure_tenant_id = "<your_tenant_id>"
 key_name = "<your_key_name>"
 ```
